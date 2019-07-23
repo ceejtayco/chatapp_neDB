@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- CSS Links -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/index.css">
+
+    <!-- socket.io link -->
+    <script src="/socket.io/socket.io.js"></script>
+    <title>ChatApp</title>
+</head>
+<body>
+    <div class="jumbotron">
+        <div class="container">
+            <h1 class="display-3">
+                Chat App
+            </h1>
+        </div>
+    </div>
+    <div class="container" id="loginContainer">
+        <div class="row justify-content-md-center">
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h1 class="display-5">Login</h1>
+                        <div id="loginForm">
+                            <div class="form-group">
+                                <label for="">Username</label>
+                                <input type="text" class="form-control" placeholder="Your username" id="username" name="username">
+                            </div>
+                            <div class="form-group">
+                                    <label for="">Password</label>
+                                    <input type="password" class="form-control" placeholder="Password" id="password" name="password">
+                            </div>
+                            <div class="form-group" id="buttonFormGroup">
+                                <button class="btn btn-success" id="login" onclick="loginEvent();">Login</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    var socket = io();
+        
+    function loginEvent() {
+        var username = document.getElementById("username").value;
+        var password = document.getElementById("password").value;
+        var user_info = {username, password};
+        socket.emit('LoginEvent', user_info);
+        socket.on('send login credentials', function(data) {
+            console.log(data[0].username);
+        });
+    }
+</script>
+</html>

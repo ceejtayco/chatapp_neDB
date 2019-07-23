@@ -1,0 +1,24 @@
+#loginForm {
+    margin-top: 3rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+#loginContainer {
+    padding-top: 5rem;
+}
+
+label {
+    font-size: 18px;
+}
+
+#buttonFormGroup {
+    margin-top: 2rem;
+}
+
+#login {
+    display: block;
+    margin: auto;
+    padding: auto;
+    width: 100%;
+}
