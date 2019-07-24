@@ -35,13 +35,16 @@
                 </ul>
             </div>
             <div class="col-md-9" id="message-content">
-                
-            </div>
-        </div>
-        <div class="row">
-            <div class="pull-right">
-                <div class="col-md-9">
-                    aijdioasd
+                <div id="compose-text">
+                    <div class="row justify-content-md-center" id="row-compose">
+                        <div class="col-md-10" id="type-message-column">
+                            <input type="text" class="form-control" id="compose" placeholder="Type to compose">
+                        </div>
+                        <div class="col-md-2" id="send-button-column">
+                            <button class="btn btn-primary" id="button-send">Send</button>
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -64,10 +67,16 @@
             button.className = "btn btn-outline-dark";
             button.id = "user-button";
             var text = document.createTextNode(data[i].username);
+            button.onclick = function() {
+                console.log(document.getElementById("user-button").textContent);
+                // socket.emit("getUserMessages", );
+            };
             row.append(button);
             button.append(text);
             document.getElementById("message-list").appendChild(row);
         } 
     });
+
+    
 </script>
 </html>

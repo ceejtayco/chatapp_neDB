@@ -42,6 +42,9 @@ io.on('connection', function(socket) {
                 socket.emit('getUsers', result);
             }
         });
+        socket.on('getUserMessages', function(data) {
+            console.log(data);
+        });
     }
 });
 
