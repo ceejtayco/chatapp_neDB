@@ -1,0 +1,39 @@
+#user-icon {
+    font-size: 50px;
+}
+
+#header {
+    display: inline;
+}
+
+#message-icon {
+    font-size: 40px;
+}
+
+#message-label {
+    display: inline;
+}
+
+#logout {
+    width: 5rem;
+}
+
+#message-row {
+    margin-top: 2rem;
+}
+
+#user-button {
+    display: block;
+    width: 100%;
+    margin: auto;
+    padding: auto;
+}
+
+#list {
+    padding: .5rem;
+}
+
+#message-content {
+    border: 1px solid black;
+    height: 30rem;
+}

@@ -53,9 +53,10 @@
         var password = document.getElementById("password").value;
         var user_info = {username, password};
         socket.emit('LoginEvent', user_info);
-        socket.on('send login credentials', function(data) {
-            console.log(data[0].username);
+        socket.on('chatbox url', function(data) {
+            window.location.href = data;
         });
+        
     }
 </script>
 </html>
