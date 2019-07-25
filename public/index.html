@@ -7,7 +7,7 @@
     <!-- CSS Links -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="css/index.css">
-
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- socket.io link -->
     <script src="/socket.io/socket.io.js"></script>
     <title>ChatApp</title>
@@ -18,25 +18,28 @@
             <h1 class="display-3">
                 Chat App
             </h1>
+            <h4 class="display-5" id="current-user">  </h4>
         </div>
     </div>
     <div class="container" id="loginContainer">
         <div class="row justify-content-md-center">
-            <div class="col-md-5">
+            <div class="col-md-10">
                 <div class="card">
                     <div class="card-body text-center">
-                        <h1 class="display-5">Login</h1>
-                        <div id="loginForm">
-                            <div class="form-group">
-                                <label for="">Username</label>
-                                <input type="text" class="form-control" placeholder="Your username" id="username" name="username">
-                            </div>
-                            <div class="form-group">
-                                    <label for="">Password</label>
-                                    <input type="password" class="form-control" placeholder="Password" id="password" name="password">
-                            </div>
-                            <div class="form-group" id="buttonFormGroup">
-                                <button class="btn btn-success" id="login" onclick="loginEvent();">Login</button>
+                        <h2 class="display-5"> <span><i class="fa fa-envelope"></i></span> Messages</h2>
+                        <div class="container" id="messages-container-scroll">
+                            <ul id="messages">
+                                
+                            </ul>
+                        </div>
+                        <div class="container" id="compose-text">
+                            <div class="row justify-content-md-center" id="row-compose">
+                                    <div class="col-md-10" id="type-message-column">
+                                        <input type="text" placeholder="Type to compose" class="form-control" id="compose-body">
+                                    </div>
+                                    <div class="col-md-2" id="col-button">
+                                        <button class="btn btn-primary" id="button-send" onclick="sendMessage();">Send</button>
+                                    </div>
                             </div>
                         </div>
                     </div>
@@ -45,18 +48,70 @@
         </div>
     </div>
 </body>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script>
     var socket = io();
+    socket.on('client number', function(data){
+        document.getElementById("current-user").textContent = data;
+    });
+
+    async function sendMessage() {
+        const response = document.getElementById("compose-body").value;
+        const user = document.getElementById("current-user").textContent;
+        const res_data = JSON.parse('{"message" : "'+ response +'", "user" : "'+user+'"}')
         
-    function loginEvent() {
-        var username = document.getElementById("username").value;
-        var password = document.getElementById("password").value;
-        var user_info = {username, password};
-        socket.emit('LoginEvent', user_info);
-        socket.on('chatbox url', function(data) {
-            window.location.href = data;
-        });
+        var options = {
+            method: 'POST',
+            body: JSON.stringify(res_data),
+            headers: {
+            'Content-Type': 'application/json',
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        };  
+        const response_message = await fetch("/saveMessage", options);
+        const response_data = await response_message.json();
         
+        console.log(response_data);
+        document.getElementById("compose-body").value = "";
     }
+
+    function fetchMessages() {
+        $('#messages li').remove();
+        $.ajax({
+            url: "/endpoint",
+            method: 'GET',
+            success: function(data) {
+                
+                for(var i = 0; i < data.data.length; i++) {
+                    var div_element = document.createElement("div");
+                    var row = document.createElement("LI");
+                    
+                    var username = "";
+                    if (document.getElementById("current-user").textContent != data.data[i].user) {
+                        username = data.data[i].user +": ";
+                    }
+                    div_element.id = "container-row";
+                    row.id = "row-message";
+                    
+                    if(username == ""){
+                        var text = document.createTextNode(data.data[i].message + username);
+                        div_element.style = "float:right;"
+                        row.style = "text-align:right;background-color: #1E90FF; border:1px solid white; color:white; float: right;";
+                    }else{
+                        div_element.style = "float:left;"
+                        var text = document.createTextNode(username + data.data[i].message);
+                        row.style = "text-align:left;background-color: lightgray; border:3px solid white;";
+                    }
+                    
+                    row.appendChild(text);
+                    div_element.appendChild(row);
+                    window.document.getElementById("messages").appendChild(div_element);
+                }
+                
+            }
+        });
+    }
+    // window.onload = fetchMessages();
+    setInterval(fetchMessages, 1000); 
 </script>
 </html>

@@ -9,45 +9,59 @@ var connection = mysql.createConnection(config);
 var connectedClients = 0;
 
 app.use(express.static('public'));
-var username = "";
-
+app.use(express.json({limit: "1mb"}));
 io.on('connection', function(socket) {
     connectedClients ++;
     console.log('Number of clients: ' + connectedClients);
+    socket.emit('client number', "user_client" + connectedClients);
     socket.on('disconnect', function(){
         connectedClients --;
         console.log('Number of clients: ' + connectedClients);
         console.log('User is disconnected');
+        
     }); 
+});
 
-    socket.on('LoginEvent', function(data) {
-        var query = "SELECT username, password FROM users WHERE username = '" + data.username + "' AND password = '" + data.password + "'"
-        connection.query(query, function(err, result, fields) {
-            if (err) throw err;
-            if (result != 0) {
-                username = result[0].username;
-                socket.emit('chatbox url', 'chatbox.html');
-            }
-        });
+var message = "";
+
+app.post('/saveMessage', function (req, res) {
+    apiData = req;
+    res.json({
+        status: 'success',
+        message: "Caitlyn Jules Tayco"
     });
-    if(username != '') {
-        // SOCKET FOR CHATBOX
-        socket.emit('send username', username);
-        var query = "SELECT username FROM users WHERE username != '" + username + "'";
-       
-        connection.query(query, function(err, result, fields) {
-            if(err) throw err;
-            if (result != 0) {
-                console.log(result);
-                socket.emit('getUsers', result);
-            }
-        });
-        socket.on('getUserMessages', function(data) {
-            console.log(data);
-        });
-    }
+    message = apiData.body;
+    // Save Message To database
+    var insert_message = "INSERT INTO messages VALUES(null, '" + apiData.body.user + "', '"+ apiData.body.message +"')";
+    connection.query(insert_message, function(error, results, fields) {
+        if(error) throw error;
+    });
+    console.log("Message: " + apiData.body.user + "; User: " + apiData.body.message);
+});
+
+app.get('/endpoint', function(req, res){
+    
+    res.json({
+        data: fetchData()
+    });
 });
 
 http.listen(5000, () => {
-    console.log("Hello world");
+    console.log("Listening to port 5000");
 });
+
+var someVar = [];
+
+function fetchData() {
+    var query = 'SELECT * FROM messages';
+    connection.query(query, function(error, rows) {
+        if(error) throw error;
+        setValue(rows);
+    });
+    return someVar;
+ }
+
+function setValue(value) {
+    someVar = value;
+    // console.log(someVar);
+}

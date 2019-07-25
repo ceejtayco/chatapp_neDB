@@ -5,7 +5,8 @@
 }
 
 #loginContainer {
-    padding-top: 5rem;
+    padding-top: 2rem;
+    
 }
 
 label {
@@ -21,4 +22,63 @@ label {
     margin: auto;
     padding: auto;
     width: 100%;
+}
+
+.card {
+    height: 35rem;
+    padding-bottom: 1rem;
+}
+
+.card-body{
+    position: relative;
+}
+
+
+#button-send {
+    display: block;
+    width: 100%;
+    margin: auto;
+    padding: auto;
+}
+
+#compose-text {
+    
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    padding-right: 3rem;
+    padding-bottom: .7rem;
+}
+
+#col-button {
+    padding-right: 2rem;
+}
+
+#type-message-column {
+    padding-right: 0;
+}
+#messages {
+    list-style-type: none;
+    display: block;
+    width: 100%;
+    margin: auto;
+    padding: auto;
+    overflow: scroll;
+    height: 420px;
+    padding: 1rem;
+}
+
+#row-message {
+    padding: 1rem;
+    border-radius: 1rem;
+    width: 65%;
+}
+
+#container-row {
+    width: 51%;
+    
+}
+
+#message-container-scroll {
+    padding: 1rem;
 }
