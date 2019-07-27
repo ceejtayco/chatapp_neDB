@@ -19,9 +19,15 @@ io.on('connection', function(socket) {
         console.log('Number of clients: ' + connectedClients);
         console.log('User is disconnected');
         
-    }); 
-});
+    });
 
+    socket.on('chat message', function(data) {
+        console.log('Labay data balik sa client ' + data);
+        io.emit('chat message', data);
+    });
+    
+
+});
 var message = "";
 
 app.post('/saveMessage', function (req, res) {
@@ -39,10 +45,9 @@ app.post('/saveMessage', function (req, res) {
     console.log("Message: " + apiData.body.user + "; User: " + apiData.body.message);
 });
 
-app.get('/endpoint', function(req, res){
-    
+app.get('/endpoint', async function(req, res){
     res.json({
-        data: fetchData()
+        data: await fetchData()
     });
 });
 
@@ -53,7 +58,7 @@ http.listen(5000, () => {
 var someVar = [];
 
 function fetchData() {
-    var query = 'SELECT * FROM messages';
+    var query = 'SELECT DISTINCT user, message FROM messages';
     connection.query(query, function(error, rows) {
         if(error) throw error;
         setValue(rows);

@@ -8,8 +8,6 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <!-- socket.io link -->
-    <script src="/socket.io/socket.io.js"></script>
     <title>ChatApp</title>
 </head>
 <body>
@@ -32,32 +30,78 @@
                                 
                             </ul>
                         </div>
-                        <div class="container" id="compose-text">
-                            <div class="row justify-content-md-center" id="row-compose">
-                                    <div class="col-md-10" id="type-message-column">
-                                        <input type="text" placeholder="Type to compose" class="form-control" id="compose-body">
-                                    </div>
-                                    <div class="col-md-2" id="col-button">
-                                        <button class="btn btn-primary" id="button-send" onclick="sendMessage();">Send</button>
-                                    </div>
+                        <form action="">
+                            <div class="container" id="compose-text">
+                                <div class="row justify-content-md-center" id="row-compose">
+                                        <div class="col-md-10" id="type-message-column">
+                                            <input type="text" placeholder="Type to compose" class="form-control" id="compose-body">
+                                        </div>
+                                        <div class="col-md-2" id="col-button">
+                                            <button class="btn btn-primary" id="button-send">Send</button>
+                                        </div>
+                                </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </body>
+<script src="/socket.io/socket.io.js"></script>
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script>
     var socket = io();
-    socket.on('client number', function(data){
-        document.getElementById("current-user").textContent = data;
+
+    $(function() {
+       
+        $('form').submit(function(e){
+            e.preventDefault();
+            var compose_body = $('#compose-body').val();
+            var current_user = $('#current-user').text();
+            socket.emit('chat message', {compose_body, current_user});
+            $('#compose-body').val('');
+            return false;
+        });
+
+        socket.on('chat message', function(data) {
+            console.log(data.current_user);
+            var user_name = data.current_user;
+            var message = data.compose_body;
+
+            // CREATE ELEMENTS
+            var div_element = document.createElement('div');
+            var row = document.createElement('LI');
+            div_element.id = 'container-row';
+            row.id = 'row-message';
+            var username = '';
+            if(user_name != document.getElementById('current-user').textContent) {
+                username = data.current_user +': ';
+            }
+
+            if(username == '') {
+                var text = document.createTextNode(message + username);
+                div_element.style = "float:right;"
+                row.style = "text-align:right;background-color: #1E90FF; border:1px solid white; color:white; float: right;";
+            }else{
+                div_element.style = "float:left;"
+                var text = document.createTextNode(username + message);
+                row.style = "text-align:left;background-color: lightgray; border:3px solid white;";
+            }
+            row.appendChild(text);
+            div_element.appendChild(row);
+            window.document.getElementById("messages").appendChild(div_element);
+            sendMessage(message, user_name);
+        });
+
+        socket.on('client number', function(data){
+            document.getElementById("current-user").textContent = data;
+        });
     });
 
-    async function sendMessage() {
-        const response = document.getElementById("compose-body").value;
-        const user = document.getElementById("current-user").textContent;
+    async function sendMessage(message, user_name) {
+        const response = message;
+        const user = user_name;
         const res_data = JSON.parse('{"message" : "'+ response +'", "user" : "'+user+'"}')
         
         var options = {
@@ -68,6 +112,7 @@
             // 'Content-Type': 'application/x-www-form-urlencoded',
             }
         };  
+
         const response_message = await fetch("/saveMessage", options);
         const response_data = await response_message.json();
         
@@ -75,7 +120,7 @@
         document.getElementById("compose-body").value = "";
     }
 
-    function fetchMessages() {
+    async function fetchMessages() {
         $('#messages li').remove();
         $.ajax({
             url: "/endpoint",
@@ -88,6 +133,7 @@
                     
                     var username = "";
                     if (document.getElementById("current-user").textContent != data.data[i].user) {
+                        console.log(document.getElementById("current-user").textContent + ' != ' + data.data[i].user);
                         username = data.data[i].user +": ";
                     }
                     div_element.id = "container-row";
@@ -111,7 +157,7 @@
             }
         });
     }
-    // window.onload = fetchMessages();
-    setInterval(fetchMessages, 1000); 
+    
+    setTimeout(fetchMessages, 3000)
 </script>
 </html>
