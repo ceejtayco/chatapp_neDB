@@ -16,7 +16,7 @@
             <h1 class="display-3">
                 Chat App
             </h1>
-            <h4 class="display-5" id="current-user">  </h4>
+            <h4 class="display-5" id="current-user">Person 1</h4>
         </div>
     </div>
     <div class="container" id="loginContainer">
@@ -72,8 +72,10 @@
             // CREATE ELEMENTS
             var div_element = document.createElement('div');
             var row = document.createElement('LI');
+            var paragraph = document.createElement("p");
             div_element.id = 'container-row';
             row.id = 'row-message';
+            paragraph.id = 'date-label';
             var username = '';
             if(user_name != document.getElementById('current-user').textContent) {
                 username = data.current_user +': ';
@@ -83,27 +85,31 @@
                 var text = document.createTextNode(message + username);
                 div_element.style = "float:right;"
                 row.style = "text-align:right;background-color: #1E90FF; border:1px solid white; color:white; float: right;";
+                paragraph.style = "text-align:right; float:right; padding-right: .5rem;"
             }else{
-                div_element.style = "float:left;"
                 var text = document.createTextNode(username + message);
-                row.style = "text-align:left;background-color: lightgray; border:3px solid white;";
+                div_element.style = "float:left;"
+                row.style = "text-align:left;background-color: lightgray; border:3px solid white; float:left;";
+                paragraph.style = "text-align:left; float:left; padding-left: .5rem;"
             }
+            paragraph.textContent = 'Sent: ' + new Date();
             row.appendChild(text);
             div_element.appendChild(row);
             window.document.getElementById("messages").appendChild(div_element);
-            sendMessage(message, user_name);
+            window.document.getElementById("messages").appendChild(paragraph);
+        
+            sendMessage(message, user_name, "Person 1");
         });
 
-        socket.on('client number', function(data){
-            document.getElementById("current-user").textContent = data;
-        });
+        // socket.on('client number', function(data){
+        //     document.getElementById("current-user").textContent = data;
+        // });
     });
 
-    async function sendMessage(message, user_name) {
+    async function sendMessage(message, user_name, current) {
         const response = message;
         const user = user_name;
-        const res_data = JSON.parse('{"message" : "'+ response +'", "user" : "'+user+'"}')
-        
+        const res_data = JSON.parse('{"message" : "'+ response +'", "user" : "'+user+'", "current" : "'+current+'"}')
         var options = {
             method: 'POST',
             body: JSON.stringify(res_data),
@@ -112,7 +118,6 @@
             // 'Content-Type': 'application/x-www-form-urlencoded',
             }
         };  
-
         const response_message = await fetch("/saveMessage", options);
         const response_data = await response_message.json();
         
@@ -130,34 +135,40 @@
                 for(var i = 0; i < data.data.length; i++) {
                     var div_element = document.createElement("div");
                     var row = document.createElement("LI");
-                    
+                    var paragraph = document.createElement("p");
                     var username = "";
-                    if (document.getElementById("current-user").textContent != data.data[i].user) {
-                        console.log(document.getElementById("current-user").textContent + ' != ' + data.data[i].user);
-                        username = data.data[i].user +": ";
+                    if (document.getElementById("current-user").textContent != data.data[i].username) {
+                        console.log(document.getElementById("current-user").textContent + ' != ' + data.data[i].username);
+                        username = data.data[i].username +": ";
                     }
                     div_element.id = "container-row";
                     row.id = "row-message";
-                    
+                    paragraph.id = 'date-label';
                     if(username == ""){
                         var text = document.createTextNode(data.data[i].message + username);
                         div_element.style = "float:right;"
                         row.style = "text-align:right;background-color: #1E90FF; border:1px solid white; color:white; float: right;";
+                        paragraph.style = "text-align:right; float:right; padding-right: .5rem;"
                     }else{
                         div_element.style = "float:left;"
                         var text = document.createTextNode(username + data.data[i].message);
-                        row.style = "text-align:left;background-color: lightgray; border:3px solid white;";
+                        row.style = "text-align:left;background-color: lightgray; border:3px solid white; float:left;";
+                        paragraph.style = "text-align:left; float:left; padding-left: .5rem;"
                     }
+                    var dt = new Date(data.data[i].date);
+                    paragraph.textContent = 'Sent: ' + dt;
                     
                     row.appendChild(text);
                     div_element.appendChild(row);
                     window.document.getElementById("messages").appendChild(div_element);
+                    window.document.getElementById("messages").appendChild(paragraph);
+                    
                 }
                 
             }
         });
     }
     
-    setTimeout(fetchMessages, 1000)
+    setTimeout(fetchMessages, 2000);
 </script>
 </html>
