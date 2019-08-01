@@ -43,30 +43,20 @@ app.post('/saveMessage', function (req, res) {
         if(error) throw error;
     });
     console.log("Message: " + apiData.body.user + "; User: " + apiData.body.message);
+    
 });
 
 app.get('/endpoint', async function(req, res){
-    res.json({
-        data: await fetchData()
+    var query = 'SELECT DISTINCT user, message FROM messages';
+    connection.query(query, function(error, rows) {
+        if(error) throw error;
+        res.json({
+            data: rows
+        });
+        console.log(rows);
     });
 });
 
 http.listen(5000, () => {
     console.log("Listening to port 5000");
 });
-
-var someVar = [];
-
-function fetchData() {
-    var query = 'SELECT DISTINCT user, message FROM messages';
-    connection.query(query, function(error, rows) {
-        if(error) throw error;
-        setValue(rows);
-    });
-    return someVar;
- }
-
-function setValue(value) {
-    someVar = value;
-    // console.log(someVar);
-}
