@@ -46,6 +46,7 @@ app.post('/saveMessage', function (req, res) {
             });
             db.close();
         });
+        
     }
 }); 
 
