@@ -47,7 +47,7 @@ app.post('/saveMessage', function (req, res) {
             db.close();
         });
     }
-});
+}); 
 
 app.get('/endpoint', async function(req, res){
     mongodb.connect(uri, { useNewUrlParser: true }, function(err, db) {
@@ -59,6 +59,7 @@ app.get('/endpoint', async function(req, res){
             res.json({
                 data: result
             });
+            console.log(result);
         });
         db.close();
     });
