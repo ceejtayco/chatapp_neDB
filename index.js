@@ -2,9 +2,9 @@ var express = require('express');
 var app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
-var mongodb = require('mongodb').MongoClient;
-
-var uri = "mongodb+srv://ceejtayco:Midwtbywi23@cluster0-ujxio.mongodb.net/test?retryWrites=true&w=majority"
+var Datastore = require('nedb');
+var db = new Datastore({ filename: 'messages' });
+db.loadDatabase();
 var connectedClients = 0;
 
 app.use(express.static('public'));
@@ -33,36 +33,22 @@ app.post('/saveMessage', function (req, res) {
         message: "Message successfully saved to mongodb!"
     });
 
-    // Catch number of triggers
-    if(apiData.body.current != apiData.body.user) {
-        // Save Message To database
-        mongodb.connect(uri, { useNewUrlParser: true }, function(err, db){
-            if (err) throw err;
-            var database = db.db("db_chatapp");
-            var obj = { username: apiData.body.user, message: apiData.body.message, date: new Date()};
-            database.collection("messages").insertOne(obj, function(err, res) {
-                if(err) throw err;
-                console.log(obj);
-            });
-            db.close();
+    // Catch numbers of triggers
+    if(apiData.body.user != apiData.body.current) {
+        var obj = { username: apiData.body.user, message: apiData.body.message, date: new Date()};
+        db.insert(obj, function(err, doc) {
+            console.log(doc);
         });
-        
-    }
+    } 
 }); 
 
 app.get('/endpoint', async function(req, res){
-    mongodb.connect(uri, { useNewUrlParser: true }, function(err, db) {
-        if (err) throw err;
-        var database = db.db("db_chatapp");
-        
-        database.collection("messages").find({}).toArray(function(err, result) {
-            if(err) throw err;
-            res.json({
-                data: result
-            });
-            console.log(result);
-        });
-        db.close();
+
+    db.find({}, function(err,doc){
+        res.json({
+            data:doc
+        })
+        console.log(doc);
     });
 });
 
