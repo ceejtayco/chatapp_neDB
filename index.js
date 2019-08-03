@@ -3,8 +3,8 @@ var app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 var Datastore = require('nedb');
-var db = new Datastore({ filename: 'messages' });
-db.loadDatabase();
+var db = new Datastore({ filename: 'messages' }); //Instantiate data storage (database)
+db.loadDatabase(); //load database
 var connectedClients = 0;
 
 app.use(express.static('public'));
